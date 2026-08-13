@@ -1,0 +1,26 @@
+# 云电脑完整定时任务清单 (crontab -l 输出参考)
+# 部署: crontab crontab.txt
+
+# ── 保活 ──────────────────────────────
+# 隧道每分钟保活(cloudflared tunnel 进程)
+* * * * * /home/box/ensure-tunnel.sh >/dev/null 2>&1
+# SSH 每5分钟保活(容器重启后 sshd 会丢)
+*/5 * * * * bash ~/scripts/ensure-sshd.sh
+
+# ── 雷达采集 ──────────────────────────
+# GitHub 情报日报(新星+Trending),采集后自动提交到仓库 daily/
+30 14 * * * cd /home/box/github-radar && python3 collect.py >> collect.log 2>&1 && bash autocommit.sh >> autocommit.log 2>&1
+
+# 全网免费软件雷达(GitHub/HN/小众软件/异次元/ProductHunt/AlternativeTo)
+45 14 * * * cd /home/box/free-software-radar && python3 crawler.py >> crawler.log 2>&1
+
+# 信息差雷达补充6路(LMArena/YouTube/AppStore美区/AI新闻/IndieHackers/HF论文)
+10 15 * * * cd ~/info-radar-extra && timeout 500 python3 collect.py >> collect.log 2>&1
+
+# ── 模型实测实验室 ────────────────────
+# 每日 02:00: 发现 HF 新模型 → 下载 → 10题统一跑分 → 报告到 ~/bench-lab/reports/
+0 2 * * * cd ~/bench-lab && python3 discover.py >> bench.log 2>&1 && python3 run_bench.py "$(cat candidate.txt)" >> bench.log 2>&1
+
+# ── 未定时(手动跑) ────────────────────
+# hf-radar 全站快照(百万级,耗时长): cd ~/hf-radar && python3 collect.py
+# deals/site-index/world-mirror 爬虫: python3 ~/deals-crawler.py 等

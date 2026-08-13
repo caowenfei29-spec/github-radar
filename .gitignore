@@ -1,0 +1,18 @@
+# 凭据与日志 —— 绝不进仓库
+gh-auth.log
+*.log
+auth.json
+credentials*
+
+# 数据库/大文件
+*.db
+*.sqlite
+*.sqlite.bak
+*.sqlite.broken
+
+# 数据产出(日报 daily/ 除外,按需提交)
+reports/
+candidates.json
+candidate.txt
+*.gguf
+__pycache__/
